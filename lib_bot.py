@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 
-TOKEN = '**********************************************'
+TOKEN = '5853898261:AAFg2jbzv1FFlvRaj0UfhKiDae99-0z8suA'
 MAIN_URL = f'https://api.telegram.org/bot{TOKEN}'
 proxies = {
     'http':'http://104.223.135.178:10000',
@@ -16,7 +16,7 @@ bot = telebot.TeleBot(TOKEN)
 def parse_habr(filters,antifilters,pages=5):
     theme_articles = []
     for i in range(1,pages):
-        time.sleep(1)
+        time.sleep(0.4)
         url = f'https://habr.com/ru/flows/develop/page{i}/'
         response = requests.get(url)
         print(i, response.status_code)
@@ -50,6 +50,10 @@ def parser(message):
         pages = int(text.split(' ')[1])
     except:
         pages = 5
+    if pages > 30:
+        bot.send_message(message.chat.id, 'Количество страниц урезано до 30')
+        pages = 30
+
     filters = text.split(' ')[2:]
     antifilters = []
     id = 0
@@ -59,7 +63,9 @@ def parser(message):
             continue
         if id != 0:
             antifilters.append(filters[i])
-    filters = filters[:id+1]
+    if id != 0:
+        filters = filters[:id]
+
     print('Фильтры: ', filters)
     print('Исключающие фильтры:', antifilters)
 
